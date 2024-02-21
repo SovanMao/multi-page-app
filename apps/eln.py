@@ -1,27 +1,23 @@
 import streamlit as st
+import pandas as pd
 from sklearn import datasets
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report
 
 def app():
-    st.title('Model')
-
-    st.write('This is the `Model` page of the multi-page app.')
-
-    st.write('The model performance of the Iris dataset is presented below.')
-
-    # Load iris dataset
+    st.title('Iris Dataset Summary')
     iris = datasets.load_iris()
-    X = iris.data
-    Y = iris.target
 
-    # Model building
-    st.header('Model performance')
-    X_train, X_test, Y_train, Y_test = train_test_split(
-        X, Y, test_size=0.2, random_state=42)
-    clf = RandomForestClassifier()
-    clf.fit(X_train, Y_train)
-    score = clf.score(X_test, Y_test)
-    st.write('Accuracy:')
-    st.write(score)
+    X = pd.DataFrame(iris.data, columns = iris.feature_names)
+    Y = pd.Series(iris.target, name = 'class')
+
+    df = pd.concat([X,Y], axis=1)
+    df['class'] = df['class'].map({0:"setosa", 1:"versicolor", 2:"virginica"})
+
+    summary = df.describe(include='all')
+    st.write(summary)
+
+    # Randomly Display Sample Data
+    st.write("## Sample Data")
+    st.write("Randomly Display Sample Data")
+    sample_size = st.slider("Select sample size", min_value=1, max_value=len(df), value=min(len(df), 10))
+    st.write(df.sample(sample_size))  
+
